@@ -98,6 +98,7 @@ class FiducialsNode {
     bool doPoseEstimation;
     bool haveCamInfo;
     bool publishFiducialTf;
+    std::string tfPrefix;
     vector <vector <Point2f> > corners;
     vector <int> ids;
     cv_bridge::CvImagePtr cv_ptr;
@@ -510,7 +511,7 @@ void FiducialsNode::poseEstimateCallback(const FiducialArrayConstPtr & msg)
                         ts.transform.rotation.z = q.z();
                         ts.header.frame_id = frameId;
                         ts.header.stamp = msg->header.stamp;
-                        ts.child_frame_id = "fiducial_" + std::to_string(ids[i]);
+                        ts.child_frame_id = tfPrefix+"fiducial_" + std::to_string(ids[i]);
                         broadcaster.sendTransform(ts);
                     }
                     else {
@@ -518,7 +519,7 @@ void FiducialsNode::poseEstimateCallback(const FiducialArrayConstPtr & msg)
                         ts.transform = ft.transform;
                         ts.header.frame_id = frameId;
                         ts.header.stamp = msg->header.stamp;
-                        ts.child_frame_id = "fiducial_" + std::to_string(ft.fiducial_id);
+                        ts.child_frame_id = tfPrefix+"fiducial_" + std::to_string(ft.fiducial_id);
                         broadcaster.sendTransform(ts);
                     }
                 }
@@ -611,6 +612,7 @@ FiducialsNode::FiducialsNode() : nh(), pnh("~"), it(nh)
     pnh.param<int>("dictionary", dicno, 7);
     pnh.param<bool>("do_pose_estimation", doPoseEstimation, true);
     pnh.param<bool>("publish_fiducial_tf", publishFiducialTf, true);
+    pnh.param<std::string>("tf_prefix", tfPrefix, "");
     pnh.param<bool>("vis_msgs", vis_msgs, false);
     pnh.param<bool>("verbose", verbose, false);
 
